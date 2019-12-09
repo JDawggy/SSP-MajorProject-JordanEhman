@@ -11,6 +11,8 @@ require "header.php";
 
     <div class="row">
 
+    <!-- SINGLE ARTICLE -->
+
         <?php
 
         if(isset($_GET["id"])){
@@ -64,7 +66,7 @@ require "header.php";
                 echo mysqli_error($conn);
             }
 
-            
+            // <!-- ALL ARTICLES -->
         } else {
             // if no ID set, show ALL articles
             // if query includes search
@@ -89,7 +91,7 @@ require "header.php";
                 <div class="row">
                 <?php
                 
-                $article_query = "  SELECT  posts.title, posts.author_id, posts.date_created, posts.id,
+                $article_query = "  SELECT posts.title, posts.author_id, posts.date_created, posts.id,
                                             images.url AS featured_image,
                                             users.first_name, users.last_name
                                     FROM posts
@@ -97,17 +99,74 @@ require "header.php";
                                     ON posts.image_id = images.id
                                     LEFT JOIN users
                                     ON posts.author_id = users.id";
+                
+                $art_where_search = "";
                                     
                 if($search_query){
 
-                $article_query .= " WHERE posts.title LIKE '%$search_query%'
-                                    OR posts.content LIKE '%$search_query%'";
+                    $art_where_search = " WHERE posts.title LIKE '%$search_query%'
+                                        OR posts.content LIKE '%$search_query%'";
+                    
+                    $article_query .= $art_where_search;
 
                 }
 
-                $article_query .= " ORDER BY posts.date_created DESC";
+                $current_page = (isset($_GET["page"])) ? $_GET["page"] : 1;
+                $limit = 4;
+                $offset = ($current_page - 1) * $limit;
+
+                $article_query .= " ORDER BY posts.date_created DESC
+                                    LIMIT $limit
+                                    OFFSET $offset";
                 
                 if($article_result = mysqli_query($conn, $article_query)) {
+
+                    $num_posts = mysqli_num_rows($article_result);
+
+                    
+                    $pagi_query = "SELECT COUNT(*) AS total FROM posts";
+
+                    if($search_query) {
+                        $pagi_query .= $art_where_search;
+                    }
+
+                    $pagi_result = mysqli_query($conn, $pagi_query);
+                    $pagi_row = mysqli_fetch_array($pagi_result);
+                    $total_articles = $pagi_row["total"];
+
+                    $page_count = ceil($total_articles / $limit);
+                    // floor = rounding numbers down
+                    // ciel = "ceiling" will round numbers up
+                    // round = rounds up if above .5 rounds down if below .5
+
+
+                    echo "<nav aria-label='Page navigation'><ul class='pagination'>";
+
+                    $get_search = ($search_query) ? "&search=" . $search_query : "";
+
+                    if($current_page > 1) {
+                        echo "<li class='page-item'><a class='page-link' href='/articles.php?page=" . ($current_page - 1) . "$get_search'>Previous</a></li>";
+                    }
+
+
+                    for ($i = 1; $i <= $page_count; $i++) {
+                        
+                        echo "<li class='page-item";
+
+                        if($current_page == $i) echo " active";
+                        echo "'><a class='page-link' href='/articles.php?page=$i" . $get_search . "'>$i</a></li>";
+
+                    }
+                    if ( $current_page < $page_count ) {
+                        echo "<li class='page-item'><a class='page-link' href='/articles.php?page=" . ($current_page + 1) . "$get_search'>Next</a></li>";
+                    }
+
+                    echo "</ul></nav>";
+
+                    
+                    
+                    echo " Pagination Here";
+
                     while($article_row = mysqli_fetch_array($article_result)) {
                         ?>
 
