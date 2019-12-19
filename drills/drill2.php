@@ -1,6 +1,7 @@
 <?php
 
-include_once ("header.php");
+require_once($_SERVER["DOCUMENT_ROOT"] . "/conn.php");
+require_once($_SERVER["DOCUMENT_ROOT"] . "/header.php");
 
 
 
@@ -116,13 +117,15 @@ endif;
 
                                 $item_value = $item_row["item"];
 
+                                
                             }
                         } // end if 
                         
-
-
+                        
+                        
                     }
-
+                    
+                    
 
                     ?>
 
@@ -148,6 +151,6 @@ endif;
 <?php
 
 
-include_once ("footer.php");
+require_once($_SERVER["DOCUMENT_ROOT"] . "/footer.php");
 
 ?>

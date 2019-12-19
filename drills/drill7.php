@@ -34,14 +34,13 @@ require_once($_SERVER["DOCUMENT_ROOT"] . "/header.php");
         
         while ( $user_row = mysqli_fetch_array($user_result) ) :
 
-   
 ?>
 
 <div class="container">
 
     <ul>
 
-        <li><?php echo $user_row["first_name"]; ?> lives in <?= $user_row["province_name"]; ?> and started on <?= date("l", strtotime($user_row["date_created"])); ?> of <?= date("F", strtotime($user_row["date_created"])); ?> in <?= date("Y", strtotime($user_row["date_created"])); ?></li>
+        <li><strong><?php echo $user_row["first_name"]; ?></strong> was created on <?= date("l", strtotime($user_row["date_created"])); ?> and is <?= ( ($user_row["role"] == 1) ? "<strong>Super Admin</strong>" : "a Regular user" ) ?> </li>
 
     </ul>
 
